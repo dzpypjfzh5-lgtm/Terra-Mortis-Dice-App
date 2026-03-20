@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Terra Mortis Dice</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=Crimson+Pro:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #11111a;
+    --surface2: #1a1a28;
+    --surface3: #20202f;
+    --border: #2a2a40;
+    --border2: #353550;
+    --accent: #c8a96e;
+    --accent-dim: #7a6540;
+    --red: #9b2335;
+    --red-bright: #d42b42;
+    --success: #4a8c6e;
+    --success-bright: #5db88e;
+    --text: #e8e0d0;
+    --text-dim: #8a8070;
+    --text-muted: #4a4840;
+    --glow: rgba(200, 169, 110, 0.12);
+    --glow-strong: rgba(200, 169, 110, 0.2);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(155,35,53,0.07) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 80%, rgba(200,169,110,0.04) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 50% at 20% 60%, rgba(74,140,110,0.03) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .container {
+    width: 100%; max-width: 480px;
+    padding: 0 20px 60px;
+    position: relative; z-index: 1;
+  }
+
+  header {
+    text-align: center;
+    padding: 28px 0 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .title-eyebrow {
+    font-size: 10px; letter-spacing: 0.3em;
+    text-transform: uppercase; color: var(--accent-dim);
+    margin-bottom: 4px;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 28px; font-weight: 900;
+    letter-spacing: 0.06em; color: var(--accent);
+    text-shadow: 0 0 40px rgba(200,169,110,0.3);
+    line-height: 1.1;
+  }
+
+  .header-sub {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; margin-top: 6px;
+  }
+
+  .header-sub-line { flex: 1; height: 1px; background: var(--border); max-width: 60px; }
+
+  .header-sub-text {
+    font-size: 10px; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--text-muted);
+    font-family: 'Crimson Pro', serif;
+    white-space: nowrap;
+  }
+
+  .tabs {
+    display: flex; border-bottom: 1px solid var(--border);
+    margin-bottom: 24px;
+  }
+
+  .tab {
+    flex: 1; background: none; border: none;
+    padding: 12px 8px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-muted); cursor: pointer;
+    border-bottom: 2px solid transparent; margin-bottom: -1px;
+    transition: all 0.2s;
+  }
+
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .section { margin-bottom: 20px; }
+
+  .section-label {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-muted); margin-bottom: 8px;
+  }
+
+  .pool-control {
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+
+  .pool-btn {
+    background: none; border: none; color: var(--accent);
+    font-size: 22px; width: 52px; height: 52px; cursor: pointer;
+    transition: background 0.15s; display: flex;
+    align-items: center; justify-content: center;
+    flex-shrink: 0; font-family: 'Cinzel', serif;
+  }
+
+  .pool-btn:hover { background: var(--glow); }
+  .pool-btn:active { background: var(--glow-strong); }
+
+  .pool-display {
+    flex: 1; text-align: center;
+    font-family: 'Cinzel', serif; font-size: 30px; font-weight: 600;
+    color: var(--text);
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    height: 52px; line-height: 52px; user-select: none; transition: color 0.15s;
+  }
+
+  .pool-display.chance { color: var(--red-bright); font-size: 13px; letter-spacing: 0.05em; }
+
+  .modifier-row {
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+
+  .modifier-label-cell {
+    flex: 1; padding: 0 14px;
+    font-size: 13px; color: var(--text-dim); font-style: italic;
+  }
+
+  .modifier-label-cell strong {
+    display: block; font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.1em; color: var(--text-muted);
+    font-style: normal; margin-bottom: 1px;
+  }
+
+  .mod-pool-display {
+    font-family: 'Cinzel', serif; font-size: 22px; font-weight: 600;
+    width: 44px; text-align: center;
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    height: 52px; line-height: 52px; user-select: none; color: var(--text-dim);
+    transition: color 0.15s;
+  }
+
+  .mod-pool-display.positive { color: var(--success-bright); }
+  .mod-pool-display.negative { color: var(--red-bright); }
+
+  .again-selector { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 7px; }
+
+  .again-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 9px 8px; cursor: pointer;
+    text-align: center; transition: all 0.15s;
+  }
+
+  .again-btn .again-label {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    color: var(--text-dim); display: block; transition: color 0.15s;
+  }
+
+  .again-btn .again-sub { font-size: 10px; color: var(--text-muted); font-style: italic; }
+  .again-btn.active { border-color: var(--accent-dim); background: var(--surface2); }
+  .again-btn.active .again-label { color: var(--accent); }
+
+  .toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+
+  .mod-toggle {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 10px 12px; cursor: pointer;
+    transition: all 0.15s; display: flex; flex-direction: column;
+    gap: 2px; position: relative; overflow: hidden; text-align: left;
+  }
+
+  .mod-toggle::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--glow); opacity: 0; transition: opacity 0.15s; pointer-events: none;
+  }
+
+  .mod-toggle.active { border-color: var(--accent-dim); background: var(--surface2); }
+  .mod-toggle.active::after { opacity: 1; }
+  .mod-toggle .mod-name { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.1em; color: var(--text-dim); transition: color 0.15s; }
+  .mod-toggle.active .mod-name { color: var(--accent); }
+  .mod-toggle .mod-desc { font-size: 11px; color: var(--text-muted); font-style: italic; line-height: 1.3; }
+
+  .mod-check {
+    position: absolute; top: 8px; right: 9px;
+    width: 13px; height: 13px; border: 1px solid var(--border);
+    border-radius: 2px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+  }
+
+  .mod-toggle.active .mod-check { border-color: var(--accent); background: var(--accent); }
+  .mod-check::after { content: '✓'; font-size: 8px; color: var(--bg); opacity: 0; transition: opacity 0.15s; }
+  .mod-toggle.active .mod-check::after { opacity: 1; }
+
+  .roll-btn {
+    width: 100%; padding: 15px; background: none;
+    border: 1px solid var(--accent-dim); color: var(--accent);
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    letter-spacing: 0.22em; text-transform: uppercase; cursor: pointer;
+    border-radius: 4px; transition: all 0.2s; position: relative;
+    overflow: hidden; margin-bottom: 20px;
+  }
+
+  .roll-btn::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(120deg, transparent 0%, var(--glow-strong) 50%, transparent 100%);
+    transform: translateX(-100%); transition: transform 0.45s;
+  }
+
+  .roll-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px rgba(200,169,110,0.12), inset 0 0 16px rgba(200,169,110,0.04); }
+  .roll-btn:hover::before { transform: translateX(100%); }
+  .roll-btn:active { transform: scale(0.99); }
+
+  .results { opacity: 0; transform: translateY(6px); transition: all 0.3s; margin-bottom: 20px; }
+  .results.visible { opacity: 1; transform: translateY(0); }
+
+  .result-header {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px 4px 0 0; border-bottom: none;
+    padding: 12px 16px; display: flex;
+    align-items: baseline; justify-content: space-between;
+  }
+
+  .result-count { font-family: 'Cinzel', serif; font-size: 24px; font-weight: 900; }
+  .result-count.success  { color: var(--success-bright); }
+  .result-count.failure  { color: var(--text-dim); }
+  .result-count.dramatic { color: var(--red-bright); }
+  .result-count.exceptional { color: var(--accent); }
+
+  .result-label { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.12em; }
+  .result-label.success  { color: var(--success); }
+  .result-label.failure  { color: var(--text-muted); }
+  .result-label.dramatic { color: var(--red); }
+  .result-label.exceptional { color: var(--accent-dim); }
+
+  .result-verdict { font-size: 12px; color: var(--text-muted); font-style: italic; }
+
+  .dice-area {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 0 0 4px 4px; padding: 12px 12px 10px;
+  }
+
+  .rote-block { margin-bottom: 8px; }
+
+  .rote-block-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .rote-block-label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--text-muted); flex-shrink: 0;
+  }
+
+  .rote-block-label.winner { color: var(--success); }
+  .rote-block-label.loser  { color: var(--text-muted); opacity: 0.5; }
+
+  .rote-block-score {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--text-muted); margin-left: auto; flex-shrink: 0;
+  }
+
+  .rote-block-score.winner { color: var(--success-bright); }
+
+  .rote-winner-badge {
+    font-size: 9px; letter-spacing: 0.1em;
+    background: rgba(74,140,110,0.2); border: 1px solid var(--success);
+    color: var(--success-bright); border-radius: 2px; padding: 1px 5px;
+    text-transform: uppercase; font-family: 'Cinzel', serif;
+  }
+
+  .rote-divider {
+    height: 1px; background: var(--border); margin: 8px 0;
+    position: relative;
+  }
+
+  .rote-divider::before {
+    content: 'vs';
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--surface); padding: 0 8px;
+    font-size: 9px; letter-spacing: 0.15em;
+    text-transform: uppercase; color: var(--text-muted);
+    font-family: 'Cinzel', serif;
+  }
+
+  .rote-block.loser .die { opacity: 0.4; }
+
+  .dice-columns {
+    display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-start;
+  }
+
+  .die-column {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 3px; flex-shrink: 0;
+  }
+
+  .explosion-connector {
+    width: 1px; height: 6px;
+    background: var(--accent-dim);
+    flex-shrink: 0;
+  }
+
+  .die {
+    width: 34px; height: 34px; border-radius: 5px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    border: 1px solid; flex-shrink: 0;
+    animation: dieReveal 0.18s ease-out both;
+  }
+
+  @keyframes dieReveal {
+    from { opacity: 0; transform: scale(0.7) rotate(-8deg); }
+    to   { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  .die.success-die  { background: rgba(74,140,110,0.15);  border-color: var(--success); color: var(--success-bright); }
+  .die.fail-die     { background: rgba(26,26,40,0.8);      border-color: var(--border);  color: var(--text-muted); }
+  .die.dramatic-die { background: rgba(155,35,53,0.2);     border-color: var(--red);     color: var(--red-bright); }
+  .die.explosion-die {
+    background: rgba(200,169,110,0.15); border-color: var(--accent);
+    color: var(--accent);
+    width: 32px; height: 32px; font-size: 12px;
+  }
+  .die.explosion-die.success-die {
+    background: rgba(200,169,110,0.18); border-color: var(--accent);
+    color: var(--accent);
+  }
+  .die.explosion-die.explodes {
+    border-color: var(--accent); border-style: solid;
+  }
+
+  .history-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+
+  .history-clear {
+    background: none; border: none; color: var(--text-muted);
+    font-family: 'Crimson Pro', serif; font-size: 12px;
+    cursor: pointer; transition: color 0.15s;
+  }
+
+  .history-clear:hover { color: var(--red-bright); }
+
+  .history-list {
+    display: flex; flex-direction: column; gap: 5px;
+    max-height: 220px; overflow-y: auto;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+
+  .history-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 3px; padding: 7px 12px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .history-meta  { color: var(--text-muted); font-style: italic; font-size: 12px; }
+  .history-result { font-family: 'Cinzel', serif; font-size: 11px; }
+  .history-result.s { color: var(--success-bright); }
+  .history-result.f { color: var(--text-dim); }
+  .history-result.d { color: var(--red-bright); }
+  .history-result.e { color: var(--accent); }
+
+  .empty-state {
+    color: var(--text-muted); font-style: italic;
+    font-size: 13px; text-align: center; padding: 20px 0;
+  }
+
+  .saved-pools-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
+
+  .saved-pool-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden; transition: border-color 0.15s;
+  }
+
+  .saved-pool-card:hover { border-color: var(--border2); }
+
+  .pool-card-main {
+    display: flex; align-items: center; padding: 10px 12px;
+    gap: 10px; cursor: pointer;
+  }
+
+  .pool-card-main:hover { background: var(--glow); }
+  .pool-card-info { flex: 1; min-width: 0; }
+
+  .pool-card-name {
+    font-family: 'Cinzel', serif; font-size: 13px; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;
+  }
+
+  .pool-card-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+  .pool-tag {
+    font-size: 10px; letter-spacing: 0.08em; padding: 1px 6px;
+    border-radius: 2px; border: 1px solid var(--border);
+    color: var(--text-muted); background: var(--surface2);
+  }
+
+  .pool-tag.accent { border-color: var(--accent-dim); color: var(--accent-dim); }
+  .pool-tag.green  { border-color: var(--success); color: var(--success); }
+  .pool-tag.red    { border-color: var(--red); color: var(--red); }
+
+  .pool-card-dice {
+    font-family: 'Cinzel', serif; font-size: 20px; font-weight: 700;
+    color: var(--accent); flex-shrink: 0; min-width: 32px; text-align: right;
+  }
+
+  .pool-card-actions { display: flex; border-top: 1px solid var(--border); }
+
+  .pool-action-btn {
+    flex: 1; background: none; border: none; padding: 7px;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: background 0.15s, color 0.15s; color: var(--text-muted);
+  }
+
+  .pool-action-btn:hover { background: var(--glow); color: var(--accent); }
+  .pool-action-btn.delete:hover { background: rgba(155,35,53,0.15); color: var(--red-bright); }
+  .pool-action-btn + .pool-action-btn { border-left: 1px solid var(--border); }
+
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(4px); z-index: 100;
+    display: flex; align-items: flex-end; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+
+  .modal {
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-bottom: none; border-radius: 12px 12px 0 0;
+    width: 100%; max-width: 480px; padding: 24px 20px 40px;
+    transform: translateY(30px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.2, 0.64, 1);
+  }
+
+  .modal-overlay.open .modal { transform: translateY(0); }
+
+  .modal-title {
+    font-family: 'Cinzel', serif; font-size: 14px; letter-spacing: 0.12em;
+    color: var(--accent); margin-bottom: 20px; text-align: center;
+  }
+
+  .modal-field { margin-bottom: 16px; }
+
+  .modal-field label {
+    display: block; font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+  }
+
+  .modal-input {
+    width: 100%; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 10px 12px; color: var(--text);
+    font-family: 'Crimson Pro', serif; font-size: 15px;
+    outline: none; transition: border-color 0.15s;
+  }
+
+  .modal-input:focus { border-color: var(--accent-dim); }
+
+  .modal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .modal-buttons { display: flex; gap: 8px; margin-top: 20px; }
+
+  .modal-btn {
+    flex: 1; padding: 11px; border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    cursor: pointer; transition: all 0.15s;
+  }
+
+  .modal-btn.primary { background: none; border: 1px solid var(--accent-dim); color: var(--accent); }
+  .modal-btn.primary:hover { border-color: var(--accent); box-shadow: 0 0 12px rgba(200,169,110,0.1); }
+  .modal-btn.secondary { background: none; border: 1px solid var(--border); color: var(--text-muted); }
+  .modal-btn.secondary:hover { color: var(--text-dim); }
+
+  .modal-again { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+
+  .modal-again-btn {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 7px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--text-muted); text-align: center; transition: all 0.15s;
+  }
+
+  .modal-again-btn.active { border-color: var(--accent-dim); color: var(--accent); background: var(--surface2); }
+
+  .modal-toggle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+
+  .modal-toggle {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 8px 10px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.08em;
+    color: var(--text-muted); text-align: left; transition: all 0.15s; position: relative;
+  }
+
+  .modal-toggle.active { border-color: var(--accent-dim); color: var(--accent); background: var(--surface2); }
+
+  .modal-counter {
+    display: flex; align-items: center;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; overflow: hidden;
+  }
+
+  .modal-counter-btn {
+    background: none; border: none; color: var(--accent);
+    font-size: 18px; width: 40px; height: 40px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s;
+  }
+
+  .modal-counter-btn:hover { background: var(--glow); }
+
+  .modal-counter-val {
+    flex: 1; text-align: center; font-family: 'Cinzel', serif;
+    font-size: 18px; font-weight: 600;
+    border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+    height: 40px; line-height: 40px; user-select: none; color: var(--text);
+  }
+
+  .modal-counter-val.pos { color: var(--success-bright); }
+  .modal-counter-val.neg { color: var(--red-bright); }
+
+  .new-pool-btn {
+    width: 100%; padding: 12px; background: none;
+    border: 1px dashed var(--border2); color: var(--text-muted);
+    font-family: 'Cinzel', serif; font-size: 11px;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    cursor: pointer; border-radius: 4px; transition: all 0.2s;
+  }
+
+  .new-pool-btn:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  .io-row {
+    display: flex; gap: 8px; margin-top: 20px;
+    border-top: 1px solid var(--border); padding-top: 20px;
+  }
+
+  .io-btn {
+    flex: 1; padding: 9px; background: none;
+    border: 1px solid var(--border); border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--text-muted); cursor: pointer; transition: all 0.15s;
+  }
+
+  .io-btn:hover { border-color: var(--border2); color: var(--text-dim); }
+
+  #importFileInput { display: none; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--surface2); border: 1px solid var(--border2);
+    color: var(--text-dim); font-family: 'Crimson Pro', serif;
+    font-size: 13px; padding: 8px 18px; border-radius: 20px;
+    opacity: 0; transition: all 0.25s; z-index: 200;
+    pointer-events: none; white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="title-eyebrow">Chronicles of Darkness</div>
+    <h1>Terra Mortis</h1>
+    <div class="header-sub">
+      <div class="header-sub-line"></div>
+      <div class="header-sub-text">Second Run · Dice Roller</div>
+      <div class="header-sub-line"></div>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('roller')">Roller</button>
+    <button class="tab" onclick="switchTab('pools')">Saved Pools</button>
+  </div>
+
+  <div id="tab-roller" class="tab-panel active">
+
+    <div class="section">
+      <div class="section-label">Dice Pool</div>
+      <div class="pool-control">
+        <button class="pool-btn" onclick="changePool(-1)">−</button>
+        <div class="pool-display" id="poolDisplay">5</div>
+        <button class="pool-btn" onclick="changePool(1)">+</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Bonus / Penalty</div>
+      <div class="modifier-row">
+        <button class="pool-btn" style="width:52px;" onclick="changeModifier(-1)">−</button>
+        <div class="mod-pool-display" id="modDisplay">0</div>
+        <button class="pool-btn" style="width:52px;" onclick="changeModifier(1)">+</button>
+        <div class="modifier-label-cell">
+          <strong>Effective Pool</strong>
+          <span id="effectivePool">5 dice</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Again Rule</div>
+      <div class="again-selector">
+        <button class="again-btn" id="again8" onclick="setAgain(8)">
+          <span class="again-label">8-again</span>
+          <span class="again-sub">reroll 8+</span>
+        </button>
+        <button class="again-btn" id="again9" onclick="setAgain(9)">
+          <span class="again-label">9-again</span>
+          <span class="again-sub">reroll 9+</span>
+        </button>
+        <button class="again-btn active" id="again10" onclick="setAgain(10)">
+          <span class="again-label">10-again</span>
+          <span class="again-sub">reroll 10s</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-label">Modifiers</div>
+      <div class="toggle-grid">
+        <button class="mod-toggle" id="roteToggle" onclick="toggleMod('rote')">
+          <span class="mod-name">Rote</span>
+          <span class="mod-desc">Roll twice, take best</span>
+          <div class="mod-check"></div>
+        </button>
+        <button class="mod-toggle" id="noAgainToggle" onclick="toggleMod('noAgain')">
+          <span class="mod-name">No Again</span>
+          <span class="mod-desc">10s don't reroll</span>
+          <div class="mod-check"></div>
+        </button>
+      </div>
+    </div>
+
+    <button class="roll-btn" onclick="roll()">Roll the Dice</button>
+
+    <div class="results" id="results">
+      <div class="result-header" id="resultHeader"></div>
+      <div class="dice-area" id="diceArea"></div>
+    </div>
+
+    <div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px;">
+      <div class="history-header">
+        <div class="section-label" style="margin:0;">Roll History</div>
+        <button class="history-clear" onclick="clearHistory()">Clear</button>
+      </div>
+      <div class="history-list" id="historyList">
+        <div class="empty-state">No rolls yet</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="tab-pools" class="tab-panel">
+    <div class="saved-pools-list" id="savedPoolsList"></div>
+    <button class="new-pool-btn" onclick="openModal()">+ New Saved Pool</button>
+    <div class="io-row">
+      <button class="io-btn" onclick="exportPools()">Export JSON</button>
+      <button class="io-btn" onclick="document.getElementById('importFileInput').click()">Import JSON</button>
+      <input type="file" id="importFileInput" accept=".json" onchange="importPools(event)">
+    </div>
+  </div>
+
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">New Saved Pool</div>
+
+    <div class="modal-field">
+      <label>Pool Name</label>
+      <input class="modal-input" id="modalName" type="text" placeholder="e.g. Dexterity + Stealth" maxlength="40">
+    </div>
+
+    <div class="modal-row">
+      <div class="modal-field">
+        <label>Base Pool Size</label>
+        <div class="modal-counter">
+          <button class="modal-counter-btn" onclick="changeModalPool(-1)">−</button>
+          <div class="modal-counter-val" id="modalPoolVal">5</div>
+          <button class="modal-counter-btn" onclick="changeModalPool(1)">+</button>
+        </div>
+      </div>
+      <div class="modal-field">
+        <label>Bonus / Penalty</label>
+        <div class="modal-counter">
+          <button class="modal-counter-btn" onclick="changeModalMod(-1)">−</button>
+          <div class="modal-counter-val" id="modalModVal">0</div>
+          <button class="modal-counter-btn" onclick="changeModalMod(1)">+</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label>Again Rule</label>
+      <div class="modal-again">
+        <button class="modal-again-btn" id="modalAgain8" onclick="setModalAgain(8)">8-again</button>
+        <button class="modal-again-btn" id="modalAgain9" onclick="setModalAgain(9)">9-again</button>
+        <button class="modal-again-btn active" id="modalAgain10" onclick="setModalAgain(10)">10-again</button>
+      </div>
+    </div>
+
+    <div class="modal-field">
+      <label>Modifiers</label>
+      <div class="modal-toggle-grid">
+        <button class="modal-toggle" id="modalRote" onclick="toggleModalMod('rote')">Rote Quality</button>
+        <button class="modal-toggle" id="modalNoAgain" onclick="toggleModalMod('noAgain')">No Again</button>
+      </div>
+    </div>
+
+    <div class="modal-buttons">
+      <button class="modal-btn secondary" onclick="closeModal()">Cancel</button>
+      <button class="modal-btn primary" onclick="savePool()">Save Pool</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let poolSize = 5, modifier = 0, againRule = 10, rote = false, noAgain = false;
+let rollHistory = [];
+let savedPools = JSON.parse(localStorage.getItem('tm_saved_pools') || '[]');
+
+let modalPool = 5, modalMod = 0, modalAgain = 10, modalRote = false, modalNoAgainFlag = false;
+let editingPoolId = null;
+
+function changePool(d) {
+  poolSize = Math.max(-5, Math.min(20, poolSize + d));
+  updatePoolDisplay();
+}
+
+function changeModifier(d) {
+  modifier = Math.max(-10, Math.min(10, modifier + d));
+  updatePoolDisplay();
+}
+
+function updatePoolDisplay() {
+  const eff = poolSize + modifier;
+  const pd = document.getElementById('poolDisplay');
+  if (poolSize <= 0) { pd.textContent = 'Chance'; pd.className = 'pool-display chance'; }
+  else { pd.textContent = poolSize; pd.className = 'pool-display'; }
+
+  const md = document.getElementById('modDisplay');
+  md.textContent = modifier === 0 ? '0' : (modifier > 0 ? '+' : '') + modifier;
+  md.className = 'mod-pool-display' + (modifier > 0 ? ' positive' : modifier < 0 ? ' negative' : '');
+
+  const ep = document.getElementById('effectivePool');
+  if (eff <= 0) { ep.textContent = 'Chance die'; ep.style.color = 'var(--red-bright)'; }
+  else { ep.textContent = eff + (eff === 1 ? ' die' : ' dice'); ep.style.color = ''; }
+}
+
+function setAgain(v) {
+  againRule = v;
+  document.querySelectorAll('.again-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('again' + v).classList.add('active');
+}
+
+function toggleMod(mod) {
+  if (mod === 'rote') { rote = !rote; document.getElementById('roteToggle').classList.toggle('active', rote); }
+  else { noAgain = !noAgain; document.getElementById('noAgainToggle').classList.toggle('active', noAgain); }
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['roller','pools'][i] === name));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'pools') renderSavedPools();
+}
+
+function d10() { return Math.floor(Math.random() * 10) + 1; }
+
+function rollOnePool(effective) {
+  const columns = [];
+  for (let i = 0; i < effective; i++) {
+    columns.push(buildChain(d10()));
+  }
+  return columns;
+}
+
+function buildChain(rootVal) {
+  const root = makeDie(rootVal);
+  const chain = [];
+  if (!noAgain) {
+    let last = root;
+    while (last.explodes) {
+      const child = makeDie(d10());
+      chain.push(child);
+      last = child;
+    }
+  }
+  return { root, chain };
+}
+
+function makeDie(val) {
+  return { value: val, success: val >= 8, explodes: val >= againRule && !noAgain };
+}
+
+function countSuccesses(columns) {
+  let s = 0;
+  for (const col of columns) {
+    if (col.root.success) s++;
+    for (const d of col.chain) { if (d.success) s++; }
+  }
+  return s;
+}
+
+function roll() {
+  const eff = poolSize + modifier;
+
+  if (eff <= 0) {
+    const val = d10();
+    const success = val === 10, dramatic = val === 1;
+    let cls, label, countText;
+    if (dramatic)       { cls = 'dramatic'; label = 'Dramatic Failure'; countText = '—'; }
+    else if (success)   { cls = 'success';  label = 'Success (Chance)'; countText = '1'; }
+    else                { cls = 'failure';  label = 'Failure (Chance)'; countText = '0'; }
+
+    renderResultHeader(cls, label, countText, 'Chance die');
+    const area = document.getElementById('diceArea');
+    area.innerHTML = '';
+    const col = document.createElement('div'); col.className = 'dice-columns';
+    const dc = document.createElement('div'); dc.className = 'die-column';
+    dc.appendChild(makeDieEl({ value: val, success, explodes: false }, 0, false, true));
+    col.appendChild(dc); area.appendChild(col);
+    showResults();
+    addHistory('Chance', cls, label, countText, 'Chance die');
+    return;
+  }
+
+  let columnsA = rollOnePool(eff);
+  let columnsB = rote ? rollOnePool(eff) : null;
+  let succA = countSuccesses(columnsA);
+  let succB = rote ? countSuccesses(columnsB) : 0;
+
+  let winnerCols, winnerSucc, loserCols, loserSucc;
+  if (rote) {
+    if (succB > succA) {
+      winnerCols = columnsB; winnerSucc = succB;
+      loserCols  = columnsA; loserSucc  = succA;
+    } else {
+      winnerCols = columnsA; winnerSucc = succA;
+      loserCols  = columnsB; loserSucc  = succB;
+    }
+  } else {
+    winnerCols = columnsA; winnerSucc = succA;
+  }
+
+  const exceptional = winnerSucc >= 5;
+  let cls, label, countText;
+  if (winnerSucc === 0)   { cls = 'failure';    label = 'Failure';             countText = '0'; }
+  else if (exceptional)   { cls = 'exceptional'; label = 'Exceptional Success'; countText = winnerSucc; }
+  else                    { cls = 'success';     label = 'Success';             countText = winnerSucc; }
+
+  const againLabel = noAgain ? 'no again' : againRule + '-again';
+  const mods = []; if (rote) mods.push('rote'); if (noAgain) mods.push('no again');
+  const verdict = `${eff}d10, ${againLabel}${mods.length ? ', ' + mods.join(', ') : ''}`;
+
+  renderResultHeader(cls, label, countText, verdict);
+
+  const area = document.getElementById('diceArea');
+  area.innerHTML = '';
+
+  if (rote) {
+    area.appendChild(makeRoteBlock(winnerCols, winnerSucc, true, 0));
+    const div = document.createElement('div'); div.className = 'rote-divider'; area.appendChild(div);
+    area.appendChild(makeRoteBlock(loserCols, loserSucc, false, 0));
+  } else {
+    area.appendChild(makeColumnsEl(winnerCols, 0, true));
+  }
+
+  showResults();
+  addHistory(eff + 'd10', cls, label, countText, verdict);
+}
+
+function makeRoteBlock(columns, successes, isWinner, delayBase) {
+  const block = document.createElement('div');
+  block.className = 'rote-block' + (isWinner ? ' winner' : ' loser');
+
+  const header = document.createElement('div');
+  header.className = 'rote-block-header';
+
+  const lbl = document.createElement('div');
+  lbl.className = 'rote-block-label ' + (isWinner ? 'winner' : 'loser');
+  lbl.textContent = isWinner ? 'Roll 1' : 'Roll 2';
+  header.appendChild(lbl);
+
+  if (isWinner) {
+    const badge = document.createElement('span');
+    badge.className = 'rote-winner-badge';
+    badge.textContent = 'Selected';
+    header.appendChild(badge);
+  }
+
+  const score = document.createElement('div');
+  score.className = 'rote-block-score ' + (isWinner ? 'winner' : '');
+  score.textContent = successes + (successes === 1 ? ' success' : ' successes');
+  header.appendChild(score);
+
+  block.appendChild(header);
+  block.appendChild(makeColumnsEl(columns, delayBase, isWinner));
+  return block;
+}
+
+function makeColumnsEl(columns, delayBase, animate = true) {
+  const el = document.createElement('div');
+  el.className = 'dice-columns';
+  let delay = delayBase;
+  columns.forEach(col => {
+    const colEl = document.createElement('div');
+    colEl.className = 'die-column';
+    colEl.appendChild(makeDieEl(col.root, delay, false, animate));
+    delay += 1;
+    col.chain.forEach(child => {
+      const conn = document.createElement('div');
+      conn.className = 'explosion-connector';
+      colEl.appendChild(conn);
+      colEl.appendChild(makeDieEl(child, delay, true, animate));
+      delay += 1;
+    });
+    el.appendChild(colEl);
+  });
+  return el;
+}
+
+function makeDieEl(die, delayIndex, isExplosion, animate = true) {
+  const el = document.createElement('div');
+  let cls = '';
+  if (isExplosion) {
+    cls = 'explosion-die';
+    if (die.explodes) cls += ' explodes';
+    else if (die.success) cls += ' success-die';
+  } else {
+    cls = die.success ? 'success-die' : 'fail-die';
+  }
+  el.className = 'die ' + cls;
+  el.textContent = die.value;
+  if (animate) {
+    el.style.animationDelay = (delayIndex * 40) + 'ms';
+  } else {
+    el.style.animation = 'none';
+  }
+  return el;
+}
+
+function renderResultHeader(cls, label, countText, verdict) {
+  document.getElementById('resultHeader').innerHTML = `
+    <div>
+      <span class="result-count ${cls}">${countText}</span>
+      <span class="result-label ${cls}"> ${label}</span>
+    </div>
+    <div class="result-verdict">${verdict}</div>
+  `;
+}
+
+function showResults() {
+  const res = document.getElementById('results');
+  res.classList.remove('visible');
+  requestAnimationFrame(() => requestAnimationFrame(() => res.classList.add('visible')));
+}
+
+function addHistory(pool, cls, label, count, verdict) {
+  const clsMap = { success: 's', failure: 'f', dramatic: 'd', exceptional: 'e' };
+  rollHistory.unshift({ pool, label, count, cls: clsMap[cls] || 'f', verdict });
+  if (rollHistory.length > 20) rollHistory.pop();
+  renderHistory();
+}
+
+function renderHistory() {
+  const list = document.getElementById('historyList');
+  if (!rollHistory.length) { list.innerHTML = '<div class="empty-state">No rolls yet</div>'; return; }
+  list.innerHTML = rollHistory.map(r => `
+    <div class="history-item">
+      <span class="history-meta">${r.verdict}</span>
+      <span class="history-result ${r.cls}">${r.count} ${r.label}</span>
+    </div>
+  `).join('');
+}
+
+function clearHistory() { rollHistory = []; renderHistory(); }
+
+function savePools() { localStorage.setItem('tm_saved_pools', JSON.stringify(savedPools)); }
+
+function poolTags(p) {
+  const tags = [];
+  if (p.modifier !== 0) tags.push({ label: (p.modifier > 0 ? '+' : '') + p.modifier + ' mod', cls: p.modifier > 0 ? 'green' : 'red' });
+  if (p.again !== 10) tags.push({ label: p.again + '-again', cls: 'accent' });
+  if (p.rote) tags.push({ label: 'Rote', cls: 'accent' });
+  if (p.noAgain) tags.push({ label: 'No Again', cls: '' });
+  return tags;
+}
+
+function renderSavedPools() {
+  const list = document.getElementById('savedPoolsList');
+  if (!savedPools.length) { list.innerHTML = '<div class="empty-state" style="margin-bottom:16px">No saved pools yet</div>'; return; }
+  list.innerHTML = savedPools.map(p => {
+    const tags = poolTags(p);
+    const eff = p.pool + p.modifier;
+    return `
+      <div class="saved-pool-card">
+        <div class="pool-card-main" onclick="loadPool('${p.id}')">
+          <div class="pool-card-info">
+            <div class="pool-card-name">${escHtml(p.name)}</div>
+            <div class="pool-card-tags">
+              ${tags.map(t => `<span class="pool-tag ${t.cls}">${t.label}</span>`).join('')}
+              ${!tags.length ? '<span class="pool-tag">10-again</span>' : ''}
+            </div>
+          </div>
+          <div class="pool-card-dice">${eff <= 0 ? '—' : eff}</div>
+        </div>
+        <div class="pool-card-actions">
+          <button class="pool-action-btn" onclick="loadPool('${p.id}')">Load</button>
+          <button class="pool-action-btn" onclick="editPool('${p.id}')">Edit</button>
+          <button class="pool-action-btn delete" onclick="deletePool('${p.id}')">Delete</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function loadPool(id) {
+  const p = savedPools.find(x => x.id === id);
+  if (!p) return;
+  poolSize = p.pool; modifier = p.modifier; againRule = p.again; rote = p.rote; noAgain = p.noAgain;
+  updatePoolDisplay();
+  document.querySelectorAll('.again-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('again' + againRule).classList.add('active');
+  document.getElementById('roteToggle').classList.toggle('active', rote);
+  document.getElementById('noAgainToggle').classList.toggle('active', noAgain);
+  switchTab('roller');
+  showToast('Loaded: ' + p.name);
+}
+
+function deletePool(id) { savedPools = savedPools.filter(x => x.id !== id); savePools(); renderSavedPools(); }
+
+function editPool(id) {
+  const p = savedPools.find(x => x.id === id);
+  if (!p) return;
+  editingPoolId = id;
+  document.getElementById('modalTitle').textContent = 'Edit Pool';
+  document.getElementById('modalName').value = p.name;
+  modalPool = p.pool; modalMod = p.modifier; modalAgain = p.again; modalRote = p.rote; modalNoAgainFlag = p.noAgain;
+  syncModalUI(); openModal(false);
+}
+
+function openModal(reset = true) {
+  if (reset && !editingPoolId) {
+    document.getElementById('modalTitle').textContent = 'New Saved Pool';
+    document.getElementById('modalName').value = '';
+    modalPool = poolSize; modalMod = modifier; modalAgain = againRule; modalRote = rote; modalNoAgainFlag = noAgain;
+    syncModalUI();
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalName').focus(), 300);
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('open'); editingPoolId = null; }
+function handleOverlayClick(e) { if (e.target === document.getElementById('modalOverlay')) closeModal(); }
+
+function syncModalUI() {
+  updateModalCounters();
+  document.querySelectorAll('.modal-again-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('modalAgain' + modalAgain).classList.add('active');
+  document.getElementById('modalRote').classList.toggle('active', modalRote);
+  document.getElementById('modalNoAgain').classList.toggle('active', modalNoAgainFlag);
+}
+
+function updateModalCounters() {
+  const pv = document.getElementById('modalPoolVal');
+  pv.textContent = modalPool <= 0 ? 'Chance' : modalPool;
+  pv.className = 'modal-counter-val';
+  const mv = document.getElementById('modalModVal');
+  mv.textContent = modalMod === 0 ? '0' : (modalMod > 0 ? '+' : '') + modalMod;
+  mv.className = 'modal-counter-val' + (modalMod > 0 ? ' pos' : modalMod < 0 ? ' neg' : '');
+}
+
+function changeModalPool(d) { modalPool = Math.max(-5, Math.min(20, modalPool + d)); updateModalCounters(); }
+function changeModalMod(d)  { modalMod  = Math.max(-10, Math.min(10, modalMod + d));  updateModalCounters(); }
+
+function setModalAgain(v) {
+  modalAgain = v;
+  document.querySelectorAll('.modal-again-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('modalAgain' + v).classList.add('active');
+}
+
+function toggleModalMod(mod) {
+  if (mod === 'rote') { modalRote = !modalRote; document.getElementById('modalRote').classList.toggle('active', modalRote); }
+  else { modalNoAgainFlag = !modalNoAgainFlag; document.getElementById('modalNoAgain').classList.toggle('active', modalNoAgainFlag); }
+}
+
+function savePool() {
+  const name = document.getElementById('modalName').value.trim();
+  if (!name) { document.getElementById('modalName').focus(); return; }
+  if (editingPoolId) {
+    const idx = savedPools.findIndex(x => x.id === editingPoolId);
+    if (idx !== -1) savedPools[idx] = { id: editingPoolId, name, pool: modalPool, modifier: modalMod, again: modalAgain, rote: modalRote, noAgain: modalNoAgainFlag };
+  } else {
+    savedPools.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), name, pool: modalPool, modifier: modalMod, again: modalAgain, rote: modalRote, noAgain: modalNoAgainFlag });
+  }
+  savePools(); closeModal(); renderSavedPools();
+  showToast(editingPoolId ? 'Pool updated' : 'Pool saved');
+  editingPoolId = null;
+}
+
+function exportPools() {
+  const json = JSON.stringify({ version: 1, game: 'terra-mortis', pools: savedPools }, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'terra-mortis-pools.json'; a.click();
+  URL.revokeObjectURL(url);
+  showToast('Exported ' + savedPools.length + ' pool' + (savedPools.length !== 1 ? 's' : ''));
+}
+
+function importPools(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const incoming = data.pools || data;
+      if (!Array.isArray(incoming)) throw new Error();
+      let added = 0;
+      incoming.forEach(p => { if (!savedPools.find(x => x.id === p.id)) { savedPools.push(p); added++; } });
+      savePools(); renderSavedPools();
+      showToast('Imported ' + added + ' new pool' + (added !== 1 ? 's' : ''));
+    } catch { showToast('Invalid file'); }
+  };
+  reader.readAsText(file); e.target.value = '';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+updatePoolDisplay();
+renderSavedPools();
+</script>
+</body>
+</html>
