@@ -759,7 +759,7 @@ let modalPool = 5, modalMod = 0, modalAgain = 10, modalRote = false, modalNoAgai
 let editingPoolId = null;
 
 function changePool(d) {
-  poolSize = Math.max(-5, Math.min(20, poolSize + d));
+  poolSize = Math.max(-5, Math.min(40, poolSize + d));
   updatePoolDisplay();
 }
 
@@ -1107,7 +1107,7 @@ function updateModalCounters() {
   mv.className = 'modal-counter-val' + (modalMod > 0 ? ' pos' : modalMod < 0 ? ' neg' : '');
 }
 
-function changeModalPool(d) { modalPool = Math.max(-5, Math.min(20, modalPool + d)); updateModalCounters(); }
+function changeModalPool(d) { modalPool = Math.max(-5, Math.min(40, modalPool + d)); updateModalCounters(); }
 function changeModalMod(d)  { modalMod  = Math.max(-10, Math.min(10, modalMod + d));  updateModalCounters(); }
 
 function setModalAgain(v) {
